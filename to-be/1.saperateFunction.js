@@ -7,7 +7,11 @@
 2. 임시 변수들을 인라인으로 교체하자
   - 지역 변수를 줄이면 추출 작업이 용이해진다.
   - 임시 변수가 추후 변경이 되지 않는다면, 인라인으로 바꾸자.
-  - 반복문과 같이 변수가 변경된다면, 변수의 복제본을 초기화하고 계산 결과를 반환한다.
+  - 반복문과 같이 변수가 변경된다면, 먼저 변수의 복제본을 초기화하고 계산 결과를 반환한다.
+    - 반복문 쪼개기로 분리할 부분을 따로 뺀다.
+    - 변수와 관련 문장들을 함께 모으면 추출이 쉬워진다.
+이렇게 메인 함수의 코드를 줄이고, 각각의 행위는 여러 개의 보조함수로 나누면
+각각의 처리 로직은 물론, 전체 흐름을 파악하기 쉬워진다.
 */
 
 import INVOICE from '../invoices.json';
@@ -15,21 +19,17 @@ import PLAYS from '../plays.json';
 
 // 공연료 청구서 출력 코드
 function statement(invoice, plays) {
-  let totalAmount = 0;
-  let volumeCredits = 0;
   let result = `청구 내역(고객명: ${invoice.customer})\n`;
 
   for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf); // 반복문에 따라 누적하기
-
     // 청구 내역을 출력한다.
     result += `${getPlayInfo(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
-    totalAmount += amountFor(perf);
   }
-  result += `총액: ${usd(totalAmount)}\n`;
-  result += `적립 포인트: ${volumeCredits}점\n`;
+
+  result += `총액: ${usd(totalAmount())}\n`;
+  result += `적립 포인트: ${totalVolumeCredits()}점\n`;
   return result;
 
   // 공연에 대한 요금 책정 함수
@@ -69,6 +69,24 @@ function statement(invoice, plays) {
     // 희극은 관객 5명마다 추가 포인트 제공
     if ('comedy' === getPlayInfo(performanceInfo).type)
       result += Math.floor(performanceInfo.audience / 5);
+    return result;
+  }
+
+  // 총 적립 포인트 계산 함수
+  function totalVolumeCredits() {
+    let result = 0;
+    for (let perf of invoice.performances) {
+      result += volumeCreditsFor(perf);
+    }
+    return result;
+  }
+
+  // 총액 계산 함수
+  function totalAmount() {
+    let result = 0;
+    for (let perf of invoice.performances) {
+      result += amountFor(perf);
+    }
     return result;
   }
 
