@@ -7,6 +7,7 @@
 2. 임시 변수들을 인라인으로 교체하자
   - 지역 변수를 줄이면 추출 작업이 용이해진다.
   - 임시 변수가 추후 변경이 되지 않는다면, 인라인으로 바꾸자.
+  - 반복문과 같이 변수가 변경된다면, 변수의 복제본을 초기화하고 계산 결과를 반환한다.
 */
 
 import INVOICE from '../invoices.json';
@@ -24,11 +25,7 @@ function statement(invoice, plays) {
   }).format;
 
   for (let perf of invoice.performances) {
-    // 포인트를 적립한다.
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ('comedy' === getPlayInfo(perf).type)
-      volumeCredits += Math.floor(perf.audience / 5);
+    volumeCredits += volumeCreditsFor(perf); // 반복문에 따라 누적하기
 
     // 청구 내역을 출력한다.
     result += `${getPlayInfo(perf).name}: ${format(amountFor(perf) / 100)} (${
@@ -67,6 +64,17 @@ function statement(invoice, plays) {
   // 공연 정보 조회 함수
   function getPlayInfo(performanceInfo) {
     return plays[performanceInfo.playID];
+  }
+
+  // 공연 포인트 적립 함수
+  function volumeCreditsFor(performanceInfo) {
+    let result = 0;
+    result += Math.max(performanceInfo.audience - 30, 0);
+
+    // 희극은 관객 5명마다 추가 포인트 제공
+    if ('comedy' === getPlayInfo(performanceInfo).type)
+      result += Math.floor(performanceInfo.audience / 5);
+    return result;
   }
 }
 
