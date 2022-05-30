@@ -1,6 +1,6 @@
 /* 
 1. 복잡한 로직을 하나의 책임을 가진 함수들로 쪼개자.
-- 각 공연에 대한 요금 책정하는 Switch문을 하나의 행위로 잡고, 하나의 amountFor 함수로 추출하기
+- 각 함수는 하는 행위를 명확히 알려주는 이름이 필요하다.
 - 변경을 가하지 않는 변수는 매개변수로 넘겨주고, 변경이 필요한 변수는 내부에서 초기화해서 사용하고 반환하기
   - 이해가 쉽도록 반환할 변수는 result로 이름 짓자.
   - 매개변수명도 이 하나의 함수만 보고도 이해가 쉽도록 조금 더 자세히 수정해준다.
@@ -18,22 +18,17 @@ function statement(invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `청구 내역(고객명: ${invoice.customer})\n`;
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
 
   for (let perf of invoice.performances) {
     volumeCredits += volumeCreditsFor(perf); // 반복문에 따라 누적하기
 
     // 청구 내역을 출력한다.
-    result += `${getPlayInfo(perf).name}: ${format(amountFor(perf) / 100)} (${
+    result += `${getPlayInfo(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
     totalAmount += amountFor(perf);
   }
-  result += `총액: ${format(totalAmount / 100)}\n`;
+  result += `총액: ${usd(totalAmount)}\n`;
   result += `적립 포인트: ${volumeCredits}점\n`;
   return result;
 
@@ -75,6 +70,15 @@ function statement(invoice, plays) {
     if ('comedy' === getPlayInfo(performanceInfo).type)
       result += Math.floor(performanceInfo.audience / 5);
     return result;
+  }
+
+  // 화폐 포맷 설정 함수
+  function usd(amount) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(amount / 100);
   }
 }
 
