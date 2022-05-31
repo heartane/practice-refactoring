@@ -12,7 +12,9 @@
 먼저 중간 매개자를 통해 처리한 데이터를 한 곳에 모으자
   - 한 버킷이 렌더링에 필요한 데이터를 모두 가지면 매개변수를 줄일 수 있다.
   - 렌더 책임을 가진 함수는 그 데이터로 알맞게 자신의 역할만 할 수 있다.
-  - 
+
+행위를 분리할 수 있다면, 분리하자
+  - 메인 함수 statement에서 데이터 생성 코드를 따로 함수로 분리하자.
 */
 
 import INVOICE from '../invoices.json';
@@ -20,24 +22,26 @@ import PLAYS from '../plays.json';
 
 // 최종 출력 코드
 function statement(invoice, plays) {
-  const statementData = {}; // 중간 매개자
-  statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances.map(extendPerformance); // 각 공연의 데이터
+  return renderPlainText(createStatementData(invoice, plays)); // 모든 정보를 가진 매개변수
+}
 
+// 중간 매개자 함수, 데이터 생성 역할
+function createStatementData(invoice, plays) {
+  const statementData = {}; // 중간 매개자 버킷
+  statementData.customer = invoice.customer;
+  statementData.performances = invoice.performances.map(extendPerformance);
   statementData.totalAmount = totalAmount(statementData);
   statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-  // 매개변수없이 직접 접근이 가능하지만, 명확성을 선호한다면 전달하자.
-  console.log('statementData', statementData);
 
-  return renderPlainText(statementData); // 모든 정보를 가진 매개변수
+  return statementData;
 
-  // 한 공연에 필요한 데이터 처리 로직을 모두 이쪽으로!
+  // 한 공연에 필요한 데이터 처리 로직
   function extendPerformance(performance) {
-    const result = { ...performance }; // 얕은 복사 -> 모든 정보를 담을 버킷이 만들어졌다!
-    result.play = getPlayInfo(performance); // play 정보를 함께 버무려!
+    const result = { ...performance };
+    result.play = getPlayInfo(performance);
     result.amount = amountFor(result);
     result.volumeCredits = volumeCreditsFor(result);
-    // console.log('불리기', result);
+
     return result;
   }
 
@@ -94,11 +98,9 @@ function statement(invoice, plays) {
 
 // 텍스트로 렌더링 책임을 가진 함수
 function renderPlainText(data) {
-  // 최상위 함수 statement와 매개변수가 다르다!
   let result = `청구 내역(고객명: ${data.customer})\n`;
 
   for (let perf of data.performances) {
-    // 청구 내역을 출력한다.
     result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
   }
 
