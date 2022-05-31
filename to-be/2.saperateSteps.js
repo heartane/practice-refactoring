@@ -49,7 +49,7 @@ function statement(invoice, plays) {
   // 공연에 대한 요금 책정 함수
   function amountFor(performance) {
     let result = 0;
-    console.log(performance);
+
     switch (performance.play.type) {
       case 'tragedy':
         result = 40000;
@@ -80,20 +80,15 @@ function statement(invoice, plays) {
 
   // 총 적립 포인트 계산 함수
   function totalVolumeCredits(data) {
-    let result = 0;
-    for (let perf of data.performances) {
-      result += perf.volumeCredits;
-    }
-    return result;
+    return data.performances.reduce(
+      (total, perf) => total + perf.volumeCredits,
+      0
+    );
   }
 
   // 총액 계산 함수
   function totalAmount(data) {
-    let result = 0;
-    for (let perf of data.performances) {
-      result += perf.amount;
-    }
-    return result;
+    return data.performances.reduce((total, perf) => total + perf.amount, 0);
   }
 }
 
