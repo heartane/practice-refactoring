@@ -11,67 +11,10 @@
 - 조건에 따라 상위클래스를 상속하는 하위클래스를 만들자
   - 상위 클래스 메소드에 조건문을 하위클래스에 적절히 오버라이딩한다.
   - 하위 클래스를 생성하고 호출 시 적절한 클래스를 사용하면 된다.
+
+이로써 새로운 장르가 추가된다면 해당 장르의 하위 클래스를 생성하고
+팩토리 함수에 인스턴스 생성을 추가하면 된다.
 */
-
-// 각 공연에 비용처리에 대한 계산 상위 클래스
-class PerformanceCalculator {
-  constructor(aPerformance, aPlay) {
-    this.performance = aPerformance;
-    this.play = aPlay;
-  }
-  // 공연에 대한 요금 책정 함수
-  get amount() {
-    let result = 0;
-
-    switch (this.play.type) {
-      case 'tragedy':
-        throw '오류발생';
-      case 'comedy':
-        result = 30000;
-        if (this.performance.audience > 20)
-          result += 1000 + 500 * (this.performance.audience - 20);
-        result += 300 * this.performance.audience;
-        break;
-      default:
-        throw new Error(`알 수 없는 장르: ${this.play.type}`);
-    }
-    return result;
-  }
-
-  // 공연 포인트 적립 함수
-  get volumeCredits() {
-    let result = 0;
-    result += Math.max(this.performance.audience - 30, 0);
-
-    if ('comedy' === this.play.type)
-      result += Math.floor(this.performance.audience / 5);
-    return result;
-  }
-}
-// 상속하는 하위 클래스
-class TragedyCalculator extends PerformanceCalculator {
-  // 오버라이딩
-  get amount() {
-    let result = 0;
-    if (this.performance.audience > 30) {
-      result += 1000 * (this.performance.audience - 30);
-    }
-    return result;
-  }
-}
-class ComedyCalculator extends PerformanceCalculator {}
-
-// 팩토릴 메소드로 조건에 따른 인스턴스 생성 -> 다형성 적용 완료
-function createPerformanceCalculator(aPerformance, aPlay) {
-  switch (aPlay.type) {
-    case 'comedy':
-      return new ComedyCalculator(aPerformance, aPlay);
-    case 'tragedy':
-      return new TragedyCalculator(aPerformance, aPlay);
-    default:
-      throw new Error(`알 수 없는 장르: ${aPlay.type}`);
-  }
-}
 
 export default function createStatementData(invoice, plays) {
   const result = {};
@@ -88,7 +31,7 @@ export default function createStatementData(invoice, plays) {
       aPerformance,
       getPlayInfo(aPerformance)
     ); // 클래스로 인스턴스 생성 대신, 팩토리 함수 적용
-    console.log(calculator);
+    // console.log(calculator);
     const result = { ...aPerformance };
     result.play = calculator.play;
     result.amount = calculator.amount;
@@ -101,16 +44,9 @@ export default function createStatementData(invoice, plays) {
     return plays[aPerformance.playID];
   }
 
-  // 공연에 대한 요금 책정 함수 -> 다형성 적용 요함
-  function amountFor(aPerformance) {
-    return new PerformanceCalculator(aPerformance, getPlayInfo(aPerformance))
-      .amount;
-  }
-
-  // 공연 포인트 적립 함수 -> 다형성 적용 요함
-  function volumeCreditsFor(aPerformance) {
-    return new PerformanceCalculator(aPerformance, getPlayInfo(aPerformance))
-      .volumeCredits;
+  // 총액 계산 함수
+  function totalAmount(data) {
+    return data.performances.reduce((total, perf) => total + perf.amount, 0);
   }
 
   // 총 적립 포인트 계산 함수
@@ -120,9 +56,58 @@ export default function createStatementData(invoice, plays) {
       0
     );
   }
+}
 
-  // 총액 계산 함수
-  function totalAmount(data) {
-    return data.performances.reduce((total, perf) => total + perf.amount, 0);
+// 각 공연에 비용처리에 대한 계산 상위 클래스
+class PerformanceCalculator {
+  constructor(aPerformance, aPlay) {
+    this.performance = aPerformance;
+    this.play = aPlay;
+  }
+  // 공연에 대한 요금 책정 함수
+  get amount() {
+    throw new Error('하위클래스에서 처리하도록 설계되었습니다');
+  }
+
+  // 공연 포인트 적립 함수
+  get volumeCredits() {
+    return Math.max(this.performance.audience - 30, 0);
+  }
+}
+
+// 상속하는 하위 클래스
+class TragedyCalculator extends PerformanceCalculator {
+  // 오버라이딩
+  get amount() {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
+class ComedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 30000;
+    if (this.performance.audience > 20) {
+      result += 1000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+    return result;
+  }
+  get volumeCredits() {
+    return super.volumeCredits + Math.floor(this.performance.audience / 5);
+  }
+}
+
+// 팩토리 함수로 조건에 따른 인스턴스 생성 -> 다형성 적용 완료
+function createPerformanceCalculator(aPerformance, aPlay) {
+  switch (aPlay.type) {
+    case 'comedy':
+      return new ComedyCalculator(aPerformance, aPlay);
+    case 'tragedy':
+      return new TragedyCalculator(aPerformance, aPlay);
+    default:
+      throw new Error(`알 수 없는 장르: ${aPlay.type}`);
   }
 }
