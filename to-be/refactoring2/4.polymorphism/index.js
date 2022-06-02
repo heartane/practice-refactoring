@@ -11,12 +11,12 @@
 - 덕분에 데이터 생성 함수를 재활용할 수 있게됐다.
 */
 
-import INVOICE from '../../invoices.json';
-import PLAYS from '../../plays.json';
+import INVOICE from '../../../as-is/refactoring2/invoices.json';
+import PLAYS from '../../../as-is/refactoring2/plays.json';
 import createStatementData from './createStatementData.js';
 
 // 최종 출력 코드
-function statement(invoice, plays) {
+export default function statement(invoice, plays) {
   return renderPlainText(createStatementData(invoice, plays)); // 모든 정보를 가진 매개변수
 }
 
@@ -63,4 +63,4 @@ function usd(amount) {
 const res = statement(INVOICE[0], PLAYS);
 const resHtml = htmlStatement(INVOICE[0], PLAYS);
 console.log(res);
-console.log(resHtml);
+// console.log(resHtml);

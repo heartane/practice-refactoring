@@ -17,8 +17,8 @@
   - 메인 함수 statement에서 데이터 생성 코드를 따로 함수로 분리하자.
 */
 
-import INVOICE from '../invoices.json';
-import PLAYS from '../plays.json';
+import INVOICE from '../../as-is/refactoring2/invoices.json';
+import PLAYS from '../../as-is/refactoring2/plays.json';
 
 // 최종 출력 코드
 function statement(invoice, plays) {

@@ -1,5 +1,5 @@
-import INVOICE from '../invoices.json';
-import PLAYS from '../plays.json';
+import INVOICE from './invoices.json';
+import PLAYS from './plays.json';
 
 // 공연료 청구서 출력 코드
 function statement(invoice, plays) {

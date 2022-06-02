@@ -14,8 +14,8 @@
 각각의 처리 로직은 물론, 전체 흐름을 파악하기 쉬워진다.
 */
 
-import INVOICE from '../invoices.json';
-import PLAYS from '../plays.json';
+import INVOICE from '../../as-is/refactoring2/invoices.json';
+import PLAYS from '../../as-is/refactoring2/plays.json';
 
 // 공연료 청구서 출력 코드
 function statement(invoice, plays) {
