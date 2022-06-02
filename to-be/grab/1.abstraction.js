@@ -81,8 +81,8 @@ class User {
     const product = this.seeProduct(productId);
 
     if (this.money >= product['price']) {
-      delete this.store.products['productId'];
-      console.log(this.store.products);
+      delete this.store.products[productId];
+      // console.log(this.store.products);
       this.money -= product['price'];
       this.store.money += product['price'];
       this.belongs.push(product);
@@ -103,3 +103,14 @@ class User {
 
 const chulsoo = new User(new GrabStore('그랩상점'));
 const younghee = new User(new RamiStore('라미상점'));
+
+console.log('새 고객 유치, 구경 중', chulsoo);
+console.log('그 여자친구도, 구경 중', younghee);
+
+chulsoo.setMoney(100000);
+younghee.setMoney(500000);
+chulsoo.purchaseProduct(0);
+younghee.purchaseProduct(1);
+
+console.log('철수가 구매하였습니다', chulsoo);
+console.log('영희 플랙스', younghee);

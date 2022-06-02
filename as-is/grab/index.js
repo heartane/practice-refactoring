@@ -64,8 +64,8 @@ class User {
     const product = this.seeProduct(productId);
 
     if (this.money >= product['price']) {
-      delete this.store.products['productId'];
-      console.log(this.store.products);
+      delete this.store.products[productId];
+      // console.log(this.store.products);
       this.money -= product['price'];
       this.store.money += product['price'];
       this.belongs.push(product);
