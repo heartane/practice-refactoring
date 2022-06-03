@@ -36,7 +36,7 @@ class Store {
   }
 
   _takeOutProduct(productId) {
-    const product = { ...products[productId] }; // 얕은 복사
+    const product = { ...this._products[productId] }; // 얕은 복사
     delete this._products[productId];
     return product;
   }
@@ -84,6 +84,9 @@ export class User {
   }
 
   _giveMoney(money) {
+    if (!this._checkMoneyEnough(money)) {
+      throw new Error('현재 가진 돈이 부족합니다');
+    }
     this._money -= money;
   }
 
@@ -109,7 +112,6 @@ export class User {
       this._giveMoney(price);
       try {
         const myProduct = this.store.sellProduct(productId, price);
-        console.log(myProduct);
         this._addBelongs(myProduct);
         return myProduct;
       } catch (error) {
@@ -129,4 +131,4 @@ const products = {
 const store = new GrabStore('그랩상점', products);
 const user = new User(store, 100000);
 user.purchaseProduct(1);
-console.log(user);
+// console.log(user);
