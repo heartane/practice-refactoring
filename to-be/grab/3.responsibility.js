@@ -12,12 +12,12 @@ class Store {
   }
 
   showProduct(productId) {
-    return this._products[productId];
+    return this._products[productId] || {};
   }
 
   sellProduct(productId, money) {
     const product = this.showProduct(productId);
-    if (!product) {
+    if (!Object.keys(product).length) {
       throw new Error('상품이 존재하지 않습니다');
     }
 

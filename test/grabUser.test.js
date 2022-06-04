@@ -8,6 +8,7 @@
 */
 import { user } from './fixtures/grabConfig.js';
 
+// unit test
 describe('checkMoneyEnough() -> 소지한 금액이 상품 구매에 충분한지 확인합니다\n', () => {
   let productPrice;
   test('소지한 금액이 원하는 상품가격보다 많다면, true를 반환합니다', () => {
@@ -29,16 +30,38 @@ describe('checkMoneyEnough() -> 소지한 금액이 상품 구매에 충분한�
 describe('giveMoney() -> 상품 구매를 위해 해당 금액을 지불합니다\n', () => {
   let productPrice;
 
-  test('상품 가격이 현재 수중의 돈보다 크다면 에러가 발생합니다', () => {
+  test('상품 가격이 현재 수중의 돈보다 크다면, 에러가 발생합니다', () => {
     productPrice = 2000000;
     expect(() => user._giveMoney(productPrice)).toThrowError();
   });
 
   test('현재 수중의 돈에서 상품 가격만큼 차감합니다', () => {
     productPrice = 50000;
-    const ownMoney = user._money;
+    const userMoney = user._money;
 
     user._giveMoney(productPrice);
-    expect(user._money).toBe(ownMoney - productPrice);
+    expect(user._money).toBe(userMoney - productPrice);
+  });
+});
+
+/* 
+통합 테스트
+1. 돈이 충분한가?
+2. 유저가 돈을 잘 냈는가?
+3. 유저의 소유 목록에 해당 상품이 들어 있는가?
+*/
+describe('purchaseProduct() - 유저가 상품을 구매합니다', () => {
+  let productId;
+  test('상품 구매에 돈이 부족하다면, 에러가 발생합니다', () => {
+    productId = 2;
+    expect(() => user.purchaseProduct(productId)).toThrow();
+  });
+  test('유저가 돈을 지불하고, 해당 상품을 획득합니다', () => {
+    productId = 1;
+    user.belongs = [];
+    const userMoney = user._money;
+    const product = user.purchaseProduct(productId);
+    expect(user.getMoney()).toBe(userMoney - product.price);
+    expect(user.getBelongs()[0]).toBe(product);
   });
 });
