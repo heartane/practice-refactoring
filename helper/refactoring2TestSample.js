@@ -41,6 +41,12 @@ export class Province {
     return this._demand;
   }
   set demand(arg) {
+    if (arg === '') {
+      throw new Error('demand must not be empty');
+    }
+    if (parseInt(arg) <= 0) {
+      throw new Error('demand must be positive');
+    }
     this._demand = parseInt(arg);
   }
 
