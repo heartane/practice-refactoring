@@ -5,20 +5,28 @@ export function printOwing(invoice) {
   console.log('**** Customer Owes ****');
   console.log('***********************');
 
-  // calculate outstanding
-  for (const o of invoice.orders) {
-    outstanding += o.amount;
-  }
+  outstanding = sumOrderAmount(invoice.orders);
 
-  // record due date
+  markDueDate(invoice);
+
+  print(invoice, outstanding);
+}
+
+function sumOrderAmount(orders) {
+  return orders.reduce((total, order) => total + order.amount, 0);
+}
+
+function markDueDate(invoice) {
   const today = new Date();
   invoice.dueDate = new Date(
     today.getFullYear(),
     today.getMonth(),
     today.getDate() + 30
   );
+  return invoice;
+}
 
-  //print details
+function print(invoice, outstanding) {
   console.log(`name: ${invoice.customer}`);
   console.log(`amount: ${outstanding}`);
   console.log(`due: ${invoice.dueDate.toLocaleDateString()}`);
