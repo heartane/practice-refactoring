@@ -7,10 +7,24 @@
 
 이를 방지하는 방법?
 - 객체를 바로 반환하지만, 복사한 것을 반환한다. -> 하지만 얕은 복사 🚨
+- 클래스로 만들어 접근 권한을 분명히 한다.
 */
-
-let defaultOwner = { firstName: '마틴', lastName: '파울러' };
+class Person {
+  #firstName;
+  #lastName;
+  constructor(data) {
+    this.#firstName = data.firstName;
+    this.#lastName = data.lastName;
+  }
+  get firstName() {
+    return this.#firstName;
+  }
+  get lastName() {
+    return this.#lastName;
+  }
+}
+let defaultOwner = new Person({ firstName: '마틴', lastName: '파울러' });
 
 export function getDefaultOwner() {
-  return { ...defaultOwner };
+  return defaultOwner;
 }
