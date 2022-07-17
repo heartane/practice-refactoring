@@ -1,3 +1,10 @@
+/* 
+컬랙션 캡슐화하기
+
+자료구조를 외부에서 자유롭게 조작할 수 없도록 내부로 캡슐화한다.
+클래스의 컬랙션을 외부에 노출하고 있진 않는가?
+*/
+
 export class Person {
   #name;
   #courses;
@@ -11,11 +18,19 @@ export class Person {
   }
 
   get courses() {
-    return this.#courses;
+    return [...this.#courses];
   }
 
-  set courses(courses) {
-    this.#courses = courses;
+  enrollCourse(course) {
+    this.#courses.push(course);
+  }
+  dropCourse(course, runIfAbsent) {
+    const index = this.#courses.indexOf(course);
+    if (index === -1) {
+      runIfAbsent();
+      return;
+    }
+    this.#courses.splice(index, 1);
   }
 }
 
@@ -36,6 +51,16 @@ export class Course {
   }
 }
 
-const ellie = new Person('엘리');
-ellie.courses.push(new Course('리팩토링', true));
-console.log(ellie.courses.length);
+const rami = new Person('라미');
+const course = new Course('리팩토링', true);
+
+rami.enrollCourse(course);
+console.log(rami.courses.length);
+
+rami.dropCourse(course, () => {
+  console.log('해당 코스가 없습니다.');
+});
+rami.dropCourse(course, () => {
+  console.log('해당 코스가 없습니다.');
+});
+console.log(rami.courses.length);
