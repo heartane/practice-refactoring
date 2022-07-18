@@ -1,16 +1,11 @@
+/* 
+  알고리즘 교체하기
+
+  반드시 테스트 코드가 있는 상태에서 안전하게 하자!
+*/
 function foundPerson(people) {
-  for (let i = 0; i < people.length; i++) {
-    if (people[i] === 'Don') {
-      return 'Don';
-    }
-    if (people[i] === 'John') {
-      return 'John';
-    }
-    if (people[i] === 'Kent') {
-      return 'Kent';
-    }
-  }
-  return '';
+  const candidates = ['Don', 'John', 'Kent'];
+  return people.find((name) => candidates.includes(name)) || '';
 }
 
 console.log(foundPerson(['John']));
