@@ -1,6 +1,10 @@
-class Employee {
+/* 
+필드 내리기
+*/
+class Employee {}
+
+class Engineer extends Employee {
   #quota;
 }
 
-class Engineer extends Employee {}
 class Salesperson extends Employee {}
